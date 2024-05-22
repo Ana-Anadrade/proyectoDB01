@@ -1,0 +1,284 @@
+-- Eliminar usuario
+DROP USER 'ana'@'localhost';
+-- Crear usuario
+CREATE USER 'ana'@'localhost' IDENTIFIED BY '12345';
+-- Consultar usuario especifico 
+SELECT user, host FROM mysql.user WHERE user = 'ana';
+-- Consultar todos los usuarios
+SELECT user, host FROM mysql.user;
+-- Modificar contraseña del usiario
+ALTER USER 'ana'@'localhost' IDENTIFIED BY '1520';
+-- Consultar las tabla de la metadata
+SELECT * FROM information_schema.tables;
+-- Consultar los usuarios de la metadata
+SELECT user, host, authentication_string FROM mysql.user;
+-- Dar privilegios 
+GRANT SELECT ON transporte_publico.* TO 'ana'@'localhost';
+GRANT privilegio ON objeto TO usuario@host;
+GRANT SUPER ON *.* TO 'joely_andrade'@'localhost';
+
+
+
+
+-- Consultar los roles de los usuarios
+SELECT 	user, host, 
+		Grant_priv, Super_priv, 
+		Select_priv, Insert_priv, 
+		Update_priv, Delete_priv, 
+		Create_priv, Drop_priv, 
+		Reload_priv, Shutdown_priv, 
+		Process_priv, File_priv, 
+		Grant_priv, References_priv, 
+		Index_priv, Alter_priv, 
+		Show_db_priv, Super_priv, 
+		Create_tmp_table_priv, 
+		Lock_tables_priv, Execute_priv, 
+		Repl_slave_priv, Repl_client_priv
+FROM mysql.user;
+select * from mysql.user;
+
+DESC information_schema.USER_PRIVILEGES;
+-- Creación de tablas
+-- Ya
+CREATE TABLE Cobrador (
+    ID_Cobrador INT AUTO_INCREMENT PRIMARY KEY,
+    Nombres VARCHAR(255),
+    Apellidos VARCHAR(255),
+    Cedula INT UNIQUE,
+    Telefono VARCHAR(20)
+);
+-- ya
+CREATE TABLE Conductor (
+    ID_Conductor INT AUTO_INCREMENT PRIMARY KEY,
+    Nombres VARCHAR(255),
+    Apellidos VARCHAR(255),
+    Cedula INT UNIQUE,
+    Telefono VARCHAR(20),
+    Num_Licencia INT UNIQUE
+);
+-- ya 
+CREATE TABLE Bus (
+    ID_Bus INT AUTO_INCREMENT PRIMARY KEY,
+    Placa VARCHAR(255) UNIQUE,
+    Modelo VARCHAR(255),
+    Capacidad INT,
+    Fecha_Adquisicion DATE
+);
+-- ya 
+CREATE TABLE Linea (
+    ID_Linea INT AUTO_INCREMENT PRIMARY KEY,
+    Ruta VARCHAR(255),
+    Num_Paradas INT,
+    Num_Unidades INT,
+    Campo VARCHAR(255)
+);
+-- ya
+CREATE TABLE Paradas (
+    ID_Parada INT AUTO_INCREMENT PRIMARY KEY,
+    Ubicacion VARCHAR(255)
+);
+-- ya 
+CREATE TABLE Tarifas (
+    ID_Tarifa INT AUTO_INCREMENT PRIMARY KEY,
+    Tarifa DOUBLE
+);
+-- ya
+CREATE TABLE Pasajero (
+    ID_Pasajero INT AUTO_INCREMENT PRIMARY KEY,
+    Nombre VARCHAR(255),
+    Apellido VARCHAR(255),
+    Cedula INT UNIQUE
+);
+-- ya
+CREATE TABLE Viaje (
+    ID_Viaje INT AUTO_INCREMENT PRIMARY KEY,
+    ID_Bus INT,
+    ID_Conductor INT,
+    ID_Pasajero INT,
+    Fecha DATE,
+    Hora TIME,
+    FOREIGN KEY (ID_Bus) REFERENCES Bus(ID_Bus),
+    FOREIGN KEY (ID_Conductor) REFERENCES Conductor(ID_Conductor),
+    FOREIGN KEY (ID_Pasajero) REFERENCES Pasajero(ID_Pasajero)
+);
+-- ya
+CREATE TABLE Registro_Viajes (
+    ID_Registro INT AUTO_INCREMENT PRIMARY KEY,
+    ID_Viaje INT,
+    Fecha DATE,
+    Hora TIME,
+    FOREIGN KEY (ID_Viaje) REFERENCES Viaje(ID_Viaje)
+);
+-- ya
+CREATE TABLE Horario (
+    ID_Horario INT AUTO_INCREMENT PRIMARY KEY,
+    ID_Linea INT,
+    Hora_Inicio TIME,
+    Hora_Fin TIME,
+    FOREIGN KEY (ID_Linea) REFERENCES Linea(ID_Linea)
+);
+-- ya
+CREATE TABLE Incidente (
+    ID_Incidente INT AUTO_INCREMENT PRIMARY KEY,
+    Descripcion TEXT,
+    Fecha DATE,
+    Hora TIME
+);
+-- ya
+CREATE TABLE Acontecimiento (
+    ID_Acontecimiento INT AUTO_INCREMENT PRIMARY KEY,
+    ID_Viaje INT,
+    ID_Incidente INT,
+    Hora TIME,
+    Fecha DATE,
+    Lugar VARCHAR(255),
+    FOREIGN KEY (ID_Viaje) REFERENCES Viaje(ID_Viaje),
+    FOREIGN KEY (ID_Incidente) REFERENCES Incidente(ID_Incidente)
+);
+-- ya 
+CREATE TABLE Multa (
+    ID_Multa INT AUTO_INCREMENT PRIMARY KEY,
+    Tipo VARCHAR(255),
+    Descripcion TEXT,
+    Monto DOUBLE
+);
+-- ya
+CREATE TABLE Informe_Multa (
+    ID_Informe_Multa INT AUTO_INCREMENT PRIMARY KEY,
+    ID_Conductor INT,
+    ID_Multa INT,
+    Fecha DATE,
+    Hora TIME,
+    FOREIGN KEY (ID_Conductor) REFERENCES Conductor(ID_Conductor),
+    FOREIGN KEY (ID_Multa) REFERENCES Multa(ID_Multa)
+);
+-- ya 
+CREATE TABLE Mantenimiento (
+    ID_Mantenimiento INT AUTO_INCREMENT PRIMARY KEY,
+    Tipo_Mantenimiento VARCHAR(255),
+    Descripcion TEXT
+);
+-- ya
+CREATE TABLE Informe_Mantenimiento (
+    ID_Informe_Mantenimiento INT AUTO_INCREMENT PRIMARY KEY,
+    ID_Mantenimiento INT,
+    ID_Bus INT,
+    Fecha DATE,
+    Costo DOUBLE,
+    FOREIGN KEY (ID_Mantenimiento) REFERENCES Mantenimiento(ID_Mantenimiento),
+    FOREIGN KEY (ID_Bus) REFERENCES Bus(ID_Bus)
+);
+-- ya
+CREATE TABLE Informe_Conduccion (
+    ID_Informe INT AUTO_INCREMENT PRIMARY KEY,
+    ID_Bus INT,
+    ID_Conductor INT,
+    ID_Cobrador INT,
+    Hora_Entrada TIME,
+    Hora_Salida TIME,
+    FechaConduccion DATE,
+    FOREIGN KEY (ID_Bus) REFERENCES Bus(ID_Bus),
+    FOREIGN KEY (ID_Conductor) REFERENCES Conductor(ID_Conductor),
+    FOREIGN KEY (ID_Cobrador) REFERENCES Cobrador(ID_Cobrador)
+);
+-- ya
+CREATE TABLE Ruta (
+    ID_Ruta INT AUTO_INCREMENT PRIMARY KEY,
+    Nombre VARCHAR(255),
+    Descripcion TEXT
+);
+SHOW TABLES;
+INSERT INTO Cobrador (Nombres, Apellidos, Cedula, Telefono) VALUES
+('Juan', 'Perez', 12345, '123-456-7890'),
+('Maria', 'Gomez', 23456, '234-567-8901'),
+('Luis', 'Martinez', 34567, '345-678-9012'),
+('Ana', 'Rodriguez', 45678, '456-789-0123'),
+('Pedro', 'Sanchez', 56789, '567-890-1234'),
+('Laura', 'Lopez', 67890, '678-901-2345');
+ -- Insertar datos en la tabla Conductor
+INSERT INTO Conductor (Nombres, Apellidos, Cedula, Telefono, Num_Licencia) VALUES
+('Pablo', 'Gutierrez', 123455, '234-567-8901', 123456789),
+('Gabriela', 'Hernandez', 234567, '345-678-9012', 234567890),
+('Manuel', 'Garcia', 345678, '456-789-0123', 345678901),
+('Jorge', 'Lopez', 4567890, '567-890-1234', 456789012),
+('Fernanda', 'Martinez', 567890, '678-901-2345', 567890123),
+('Marcelo', 'Perez', 678901, '789-012-3456', 678901234),
+('Carmen', 'Sanchez', 789015, '890-123-4567', 789012345),
+('Ricardo', 'Rodriguez', 890123, '901-234-5678', 890123456),
+('Isabel', 'Flores', 901255, '123-450-9876', 901234567);
+
+-- Insertar datos en la tabla Bus
+INSERT INTO Bus (Placa, Modelo, Capacidad, Fecha_Adquisicion) VALUES
+('ABC123', 'Mercedes', 50, '2023-01-15'),
+('DEF456', 'Volvo', 40, '2023-02-20'),
+('GHI789', 'Scania', 55, '2023-03-25'),
+('JKL012', 'MAN', 45, '2023-04-30'),
+('MNO345', 'Volksbus', 60, '2023-05-05'),
+('PQR678', 'Iveco', 50, '2023-06-10'),
+('STU901', 'Renault', 35, '2023-07-15'),
+('VWX234', 'Hyundai', 55, '2023-08-20'),
+('YZA567', 'Isuzu', 40, '2023-09-25'),
+('BCD890', 'Toyota', 50, '2023-10-30');
+
+-- Insertar datos en la tabla Linea
+INSERT INTO Linea (Ruta, Num_Paradas, Num_Unidades, Campo) VALUES
+('Ruta 1', 10, 5, 'Campo A'),
+('Ruta 2', 8, 4, 'Campo B'),
+('Ruta 3', 12, 6, 'Campo C'),
+('Ruta 4', 15, 7, 'Campo D'),
+('Ruta 5', 10, 5, 'Campo E'),
+('Ruta 6', 8, 4, 'Campo F'),
+('Ruta 7', 12, 6, 'Campo G'),
+('Ruta 8', 15, 7, 'Campo H'),
+('Ruta 9', 10, 5, 'Campo I'),
+('Ruta 10', 8, 4, 'Campo J');
+
+-- Insertar datos en la tabla Paradas
+INSERT INTO Paradas (Ubicacion) VALUES
+('Parada 1'),
+('Parada 2'),
+('Parada 3'),
+('Parada 4'),
+('Parada 5'),
+('Parada 6'),
+('Parada 7'),
+('Parada 8'),
+('Parada 9'),
+('Parada 10');
+
+-- Insertar datos en la tabla Tarifas
+INSERT INTO Tarifas (Tarifa) VALUES
+(2.50),
+(3.00),
+(3.50),
+(4.00),
+(4.50),
+(5.00),
+(5.50),
+(6.00),
+(6.50),
+(7.00);
+
+-- Insertar datos en la tabla Pasajero
+INSERT INTO Pasajero (Nombre, Apellido, Cedula) VALUES
+('Carlos', 'Perez', 123456),
+('Maria', 'Gomez', 234567),
+('Luis', 'Martinez', 345678),
+('Ana', 'Rodriguez', 456789),
+('Pedro', 'Sanchez', 567895),
+('Laura', 'Lopez', 678901),
+('Sofia', 'Torres', 789014),
+('Diego', 'Ramirez', 890124),
+('Elena', 'Flores', 901234),
+('Javier', 'Diaz', 123450);
+
+-- Insertar datos en la tabla Viaje
+
+INSERT INTO Viaje (ID_Bus, ID_Conductor, ID_Pasajero, Fecha, Hora) VALUES
+(1, 1, 1, 2024-05-22, 08:00:00),
+(2, 2, 2, '2024-05-22', '08:15:00'),
+(3, 3, 3, '2024-05-22', '08:30:00'),
+(4, 4, 4, '2024-05-22', '08:45:00'),
+(5, 5, 5, '2024-05-22', '09:00:00'),
+(6, 6, 6, '2024-05-22', '09:15:00'),
+(7, 7, 7, '2024-05-22', '09:30:00');
